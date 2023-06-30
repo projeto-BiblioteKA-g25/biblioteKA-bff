@@ -3,6 +3,9 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
+    class Meta:
+        ordering = ['id']
+
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(max_length=120, unique=True)
     employee = models.BooleanField(default=False)
