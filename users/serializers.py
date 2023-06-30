@@ -1,0 +1,3 @@
+'''
+fazer com model serializer
+'''
