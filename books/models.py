@@ -10,4 +10,4 @@ class Book(models.Model):
     publishing_date = models.DateTimeField()
     author = models.CharField(max_length=50)
     pages = models.IntegerField()
-    
+
