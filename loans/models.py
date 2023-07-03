@@ -10,8 +10,12 @@ class Loan(models.Model):
     status = models.BooleanField(default=False)
 
     copy = models.ForeignKey(
-        "copies.Copy", on_delete=models.CASCADE, related_name="loans"
+        "copies.Copy",
+        on_delete=models.CASCADE,
+        related_name="loans",
     )
     user = models.ForeignKey(
-        "users.User", on_delete=models.CASCADE, related_name="loans"
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="loans",
     )
