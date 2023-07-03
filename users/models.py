@@ -11,3 +11,7 @@ class User(AbstractUser):
     employee = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     block_end_date = models.DateField(null=True, blank=True)
+    following = models.ManyToManyField(
+        "books.Book",
+        related_name="followers",
+    )
