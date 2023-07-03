@@ -15,9 +15,8 @@ class UserSerializer(serializers.ModelSerializer):
             "employee",
             "is_active",
             "block_end_date",
-            "following"
+            "following",
         ]
-
         extra_kwargs = {
             "following": {"read_only": True},
             "password": {"write_only": True},
@@ -35,12 +34,13 @@ class UserSerializer(serializers.ModelSerializer):
                 ],
             },
         }
+        deth = 1
 
     def create(self, validated_data: dict) -> User:
         return User.objects.create_user(**validated_data)
 
-class UserBookSerializer(serializers.ModelSerializer):
 
+class UserBookSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
@@ -51,9 +51,8 @@ class UserBookSerializer(serializers.ModelSerializer):
             "employee",
             "is_active",
             "block_end_date",
-            "following"
+            "following",
         ]
-
         extra_kwargs = {
             "password": {"write_only": True},
             "username": {
@@ -70,7 +69,7 @@ class UserBookSerializer(serializers.ModelSerializer):
                 ],
             },
         }
+        deth = 1
 
     def create(self, validated_data: dict) -> User:
         return User.objects.create_user(**validated_data)
-

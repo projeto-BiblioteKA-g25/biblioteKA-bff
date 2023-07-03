@@ -8,4 +8,4 @@ class CopySerializer(serializers.ModelSerializer):
         book_id = BookSerializer(read_only=True)
 
         model = Copy
-        fields = ["id", "quantity", "avaliable", "book_id"]
+        fields = ["id", "avaliable", "book_id"]

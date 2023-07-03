@@ -10,7 +10,7 @@ class LoanSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Loan
-        fields = ["loan_date", "return_date", "copy", "user"]
+        fields = ["loan_date", "return_date", "status", "copy", "user"]
         extra_kwargs = {
             "loan_date": {"read_only": True},
             "return_date": {"read_only": True},
