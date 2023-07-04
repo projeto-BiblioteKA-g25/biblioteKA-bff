@@ -22,5 +22,5 @@ class LoanSerializer(serializers.ModelSerializer):
             "return_date": {"read_only": True},
         }
 
-        def create(self, validated_data: dict) -> Loan:
-            ...
+    def create(self, validated_data: dict) -> Loan:
+        return Loan.objects.create(**validated_data)
