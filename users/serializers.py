@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "password",
             "employee",
-            "is_active",
+            "is_blocked",
             "block_end_date",
             "following",
         ]
