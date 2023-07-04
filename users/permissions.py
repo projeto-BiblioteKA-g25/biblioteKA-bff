@@ -10,8 +10,23 @@ class IsAccountEmployee(permissions.BasePermission):
         return request.user.is_authenticated and request.user.employee
 
 
-class IsAccountUser(permissions.BasePermission):
+class IsAccountUserOrEmployee(permissions.BasePermission):
     def has_object_permission(self, request, view: View, obj: User) -> bool:
-        if request.method in permissions.SAFE_METHODS:
+        if request.user.is_authenticated and obj == request.user:
             return True
-        return request.user.is_authenticated and obj == request.user
+        if request.user.is_authenticated and request.user.employee:
+            return True
+        return False
+
+
+class IsAccountEmployeeGetUsers(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if (
+            request.method in permissions.SAFE_METHODS
+            and request.user.is_authenticated
+            and request.user.employee
+        ):
+            return True
+        if request.method in "POST":
+            return True
+        return False
