@@ -20,6 +20,7 @@ class LoanSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "loan_date": {"read_only": True},
             "return_date": {"read_only": True},
+            "status": {"read_only": True},
         }
 
     def create(self, validated_data: dict) -> Loan:
