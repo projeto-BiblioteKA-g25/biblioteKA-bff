@@ -7,3 +7,7 @@ class SuspendedUserError(APIException):
 
 class CopyUnavailableError(APIException):
     status_code = 404
+
+
+class UserIsBlockedError(APIException):
+    status_code = 403
