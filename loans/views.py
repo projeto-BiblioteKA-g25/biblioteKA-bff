@@ -5,22 +5,18 @@ from copies.models import Copy
 from books.models import Book
 from users.models import User
 from .serializers import LoanSerializer
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.permissions import IsAuthenticated
 from .exceptions import SuspendedUserError, CopyUnavailableError
 from django.shortcuts import get_object_or_404
-from users.permissions import IsAccountUserOrEmployee
+from users.permissions import IsAccountOwnerOrEmployee, IsAccountEmployee
 
 
-# Create your views here.
-class LoanView(generics.ListCreateAPIView):
+class LoanView(generics.ListAPIView):
     queryset = Loan.objects.all()
     serializer_class = LoanSerializer
 
 
-class LoanCreateView(generics.ListCreateAPIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+class LoanCreateView(generics.CreateAPIView):
+    permission_classes = [IsAccountEmployee]
     queryset = Loan.objects.all()
     serializer_class = LoanSerializer
 
@@ -56,9 +52,8 @@ class LoanCreateView(generics.ListCreateAPIView):
             serializer.save(return_date=date_return, user=user, copy=copy)
 
 
-class LoanDatailsView(generics.UpdateAPIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAccountUserOrEmployee]
+class LoanDetailView(generics.UpdateAPIView):
+    permission_classes = [IsAccountOwnerOrEmployee]
     queryset = Loan.objects.all()
     serializer_class = LoanSerializer
 
