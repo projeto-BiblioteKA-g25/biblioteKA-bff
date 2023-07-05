@@ -11,6 +11,7 @@ class LoanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Loan
         fields = [
+            "id",
             "loan_date",
             "return_date",
             "status",

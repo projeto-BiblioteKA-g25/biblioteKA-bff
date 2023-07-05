@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Copy
-from users.models import User
 from books.serializers import BookSerializer
 
 
@@ -12,7 +11,7 @@ class CopySerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "avaliable",
-            "book"
+            "book",
         ]
 
     def get_book(self, obj):
