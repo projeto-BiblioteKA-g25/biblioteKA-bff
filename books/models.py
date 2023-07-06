@@ -1,5 +1,4 @@
 from django.db import models
-from users.models import User
 
 
 class Book(models.Model):
@@ -7,7 +6,8 @@ class Book(models.Model):
         ordering = ["id"]
 
     title = models.CharField(max_length=100)
+    synopsis = models.TextField(null=True)
     publishing_date = models.DateTimeField()
     author = models.CharField(max_length=50)
     pages = models.IntegerField()
-    
+    quantity = models.PositiveIntegerField(default=1)
