@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from .permissions import (
     IsAccountOwnerOrEmployee,
     IsAccountEmployeExceptPost,
+    IsAccountOwner,
 )
 from rest_framework import generics
 
@@ -18,24 +19,26 @@ class UserView(ListCreateAPIView):
 
 class UserDetailView(generics.RetrieveDestroyAPIView):
     permission_classes = [IsAccountOwnerOrEmployee]
-
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 
 class UserBookView(generics.UpdateAPIView):
+    permission_classes = [IsAccountOwner]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
     def perform_update(self, serializer):
-        pk = self.kwargs.get("pk")
-        get_user = get_object_or_404(User, pk=pk)
-        user = UserSerializer(instance=get_user).data
-
+        user = self.request.user
         following = self.request.data.pop("following")
-
         for id in following:
             books = get_object_or_404(Book, id=id)
-            get_user.following.add(books)
-
+            user.following.add(books)
         serializer.save()
+
+    def perform_destroy(self, instance):
+        user = self.request.user
+        following = self.request.data.pop("following")
+        for id in following:
+            books = get_object_or_404(Book, id=id)
+            user.following.remove(books)

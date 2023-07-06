@@ -8,7 +8,6 @@ from users.permissions import IsAccountEmployee
 
 class CopyView(generics.ListCreateAPIView):
     permission_classes = [IsAccountEmployee]
-
     queryset = Copy.objects.all()
     serializer_class = CopySerializer
 
@@ -16,3 +15,9 @@ class CopyView(generics.ListCreateAPIView):
         pk = self.request.data.pop("book")
         book = get_object_or_404(Book, pk=pk)
         serializer.save(book=book)
+
+
+class CopyDetailView(generics.UpdateAPIView):
+    permission_classes = [IsAccountEmployee]
+    queryset = Copy.objects.all()
+    serializer_class = CopySerializer
