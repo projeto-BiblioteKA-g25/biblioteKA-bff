@@ -11,6 +11,7 @@ from .exceptions import (
     UserIsBlockedError,
 )
 from django.shortcuts import get_object_or_404
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from users.permissions import IsAccountOwnerOrEmployee, IsAccountEmployee
 
 
@@ -98,3 +99,13 @@ class LoanDetailView(generics.UpdateAPIView):
 
         loan.status = True
         loan.save()
+
+
+class LoanUserView(generics.ListAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAccountOwnerOrEmployee]
+    serializer_class = LoanSerializer
+
+    def get_queryset(self):
+        user = get_object_or_404(User, pk=self.kwargs["pk"])
+        return Loan.objects.filter(user=user)
