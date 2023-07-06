@@ -106,6 +106,11 @@ class LoanUserView(generics.ListAPIView):
     permission_classes = [IsAccountOwnerOrEmployee]
     serializer_class = LoanSerializer
 
+    def get(self, request, *args, **kwargs):
+        user = get_object_or_404(User, pk=self.kwargs["pk"])
+        self.check_object_permissions(request, user)
+        return self.list(request, *args, **kwargs)
+
     def get_queryset(self):
         user = get_object_or_404(User, pk=self.kwargs["pk"])
         return Loan.objects.filter(user=user)
