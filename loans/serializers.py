@@ -10,11 +10,19 @@ class LoanSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Loan
-        fields = ["loan_date", "return_date", "copy", "user"]
+        fields = [
+            "id",
+            "loan_date",
+            "return_date",
+            "status",
+            "copy",
+            "user",
+        ]
         extra_kwargs = {
             "loan_date": {"read_only": True},
             "return_date": {"read_only": True},
+            "status": {"read_only": True},
         }
 
-        def create(self, validated_data: dict) -> Loan:
-            ...
+    def create(self, validated_data: dict) -> Loan:
+        return Loan.objects.create(**validated_data)
