@@ -181,7 +181,7 @@ SIMPLE_JWT = {
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "BiblioteKA",
-    "DESCRIPTION": "Your project description",
+    "DESCRIPTION": "Project developed to loan books to users",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
