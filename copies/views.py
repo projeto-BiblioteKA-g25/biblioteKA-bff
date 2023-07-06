@@ -1,6 +1,5 @@
-from books.serializers import BookSerializer
 from books.models import Book
-from users.permissions import IsAccountEmployeeExceptGet
+from users.permissions import IsAccountEmployeeExceptGet, IsAccountEmployee
 from .serializers import CopySerializer
 from .models import Copy
 from rest_framework import generics
@@ -8,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 
 
-class CopyView(generics.ListAPIView):
+class CopyView(generics.ListCreateAPIView):
     permission_classes = [IsAccountEmployeeExceptGet]
 
     queryset = Copy.objects.all()
@@ -33,3 +32,9 @@ class CopyView(generics.ListAPIView):
     )
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
+
+
+class CopyDetailView(generics.UpdateAPIView):
+    permission_classes = [IsAccountEmployee]
+    queryset = Copy.objects.all()
+    serializer_class = CopySerializer

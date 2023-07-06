@@ -5,8 +5,11 @@ from copies.models import Copy
 from books.models import Book
 from users.models import User
 from .serializers import LoanSerializer
-from .exceptions import SuspendedUserError, CopyUnavailableError
-
+from .exceptions import (
+    SuspendedUserError,
+    CopyUnavailableError,
+    UserIsBlockedError,
+)
 from django.shortcuts import get_object_or_404
 from users.permissions import IsAccountOwnerOrEmployee, IsAccountEmployee
 
@@ -69,25 +72,23 @@ class LoanDetailView(generics.UpdateAPIView):
         block_end_date = date_now + timedelta(days=3)
 
         if date_now > date_return:
-            # adicionei uma verificação antes se o usuário já não estiver bloqueado, aí ele será bloqueado
             if not user.is_blocked:
                 user.is_blocked = True
                 user.block_end_date = block_end_date
                 user.save()
 
-            # verificando se existem empréstimos pendentes de livros, puxando o campo status da model conforme a Lucira sugeriu
-            pending_loans = Loan.objects.filter(
-                user=user, status=False).exists()
+            pending_loans = Loan.objects.filter(user=user, status=False).exists()
 
-            # verificando que se não existirem mais as pendências, vão ser adicionados mais 5 dias de suspensão ao usuário
             if not pending_loans:
                 additional_block_days_after_return = 5
                 user.block_end_date += timedelta(
-                    days=additional_block_days_after_return)
+                    days=additional_block_days_after_return
+                )
                 user.save()
 
             raise UserIsBlockedError(
-                "This user can not borrow any books for at least 5 more days")
+                "This user can not borrow any books for at least 5 more days"
+            )
 
         book.quantity += 1
         book.save()
