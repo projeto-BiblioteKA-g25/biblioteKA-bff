@@ -5,7 +5,7 @@ from books.serializers import BookSerializer
 
 class CopySerializer(serializers.ModelSerializer):
     class Meta:
-        book_id = BookSerializer(read_only=True)
+        book = BookSerializer(read_only=True)
 
         model = Copy
-        fields = ["id", "quantity", "avaliable", "book_id"]
+        fields = ["id", "avaliable", "book"]
