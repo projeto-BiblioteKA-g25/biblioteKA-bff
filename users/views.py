@@ -16,6 +16,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.views import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from .exceptions import NotFollowBookError
 
 
 class UserView(ListCreateAPIView):
@@ -124,8 +125,12 @@ class UserBookView(generics.RetrieveUpdateDestroyAPIView):
         user = self.request.user
         following = self.request.data.pop("following")
         for id in following:
-            books = get_object_or_404(Book, id=id)
-            user.following.remove(books)
+            book = get_object_or_404(Book, id=id)
+
+            if not book in following:
+                raise NotFollowBookError("You don't follow this book")
+
+            user.following.remove(book)
 
     @extend_schema(
         operation_id="user_retrive_put",
