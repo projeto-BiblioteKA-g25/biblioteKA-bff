@@ -1,7 +1,7 @@
 from rest_framework.generics import ListCreateAPIView
 from .models import User
 from books.models import Book
-from .serializers import UserSerializer, SendEmailSerializer
+from .serializers import UserSerializer
 from django.shortcuts import get_object_or_404
 from .permissions import (
     IsAccountOwnerOrEmployee,
@@ -9,9 +9,6 @@ from .permissions import (
     IsAccountOwner,
 )
 from rest_framework import generics
-from rest_framework.views import APIView, Response, Request
-from django.core.mail import send_mail
-from django.conf import settings
 from drf_spectacular.utils import extend_schema
 
 
@@ -71,7 +68,7 @@ class UserBookView(generics.RetrieveUpdateDestroyAPIView):
 
     @extend_schema(
         operation_id="user_retrive_books_by_id",
-        description="Rota para capturar livros pelo usuários.  Para isso é necessário que o usuário esteja autenticado | token e com permissão de acesso. Sendo assim este usuário precisa ser o dono da conta",
+        description="Rota para capturar livros seguidos pelo ID do usuário.  Para isso é necessário que o usuário esteja autenticado | token e com permissão de acesso. Sendo assim este usuário precisa ser o dono da conta",
         summary="Capturar usuário por ID associado aos livros",
         tags=["users"],
         exclude=True,
@@ -81,8 +78,8 @@ class UserBookView(generics.RetrieveUpdateDestroyAPIView):
 
     @extend_schema(
         operation_id="user_update_books_by_id",
-        description="Rota atualizar os dados de usuários assosciados aos livros que estão sob seus cuidados.  Para isso é necessário que o usuário esteja autenticado | token e com permissão de acesso. Sendo assim este usuário precisa ser o dono da conta",
-        summary="Atualizar usuário por ID associado aos livros",
+        description="Rota para seguir livros, sendo necessário a indicação do ID do usuário na URL e no campo 'following' os ID's do livros que serão seguidos. Apenas o usuário poderá acrescentar os livros que deseja seguir no seu campo 'following'. Para isso é necessário que o usuário esteja autenticado | token e com permissão de acesso.",
+        summary="Seguir livro por ID associado ao usuário",
         tags=["users"],
     )
     def patch(self, request, *args, **kwargs):
@@ -98,8 +95,8 @@ class UserBookView(generics.RetrieveUpdateDestroyAPIView):
 
     @extend_schema(
         operation_id="user_delete_books_by_id",
-        description="Rota excluir os dados de usuários assosciados aos livros que estão sob seus cuidados.  Para isso é necessário que o usuário esteja autenticado | token e com permissão de acesso. Sendo assim este usuário precisa ser o dono da conta",
-        summary="Excluir usuário por ID associado aos livros",
+        description="Rota para excluir os livros que o usuário deseja deixar de seguir.  Para isso é necessário que o usuário esteja autenticado | token e com permissão de acesso. Sendo assim, o usuário precisa ser o dono da conta",
+        summary="Excluir livro seguido por ID associado ao usuário",
         tags=["users"],
     )
     def delete(self, request, *args, **kwargs):
@@ -114,21 +111,10 @@ class UserBookView(generics.RetrieveUpdateDestroyAPIView):
 
     @extend_schema(
         operation_id="user_retrive_put",
-        description="Rota para alterar todos os dados de um usuário específico através de sua ID (pk). É necessário ter autenticação | token e permissão. O usuário que realizar a exclusão precisa ser admin ou o usuário que é dono da conta",
+        description="Rota para seguir livros, sendo necessário a indicação do ID do usuário na URL e no campo 'following' os ID's do livros que serão seguidos. Apenas o usuário poderá acrescentar os livros que deseja seguir no seu campo 'following'. Para isso é necessário que o usuário esteja autenticado | token e com permissão de acesso.",
         summary="Alterar todos os dados de um usuários específico por ID",
         tags=["users"],
         exclude=True,
     )
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
-
-
-class SendEmailView(APIView):
-    def post(self, req: Request) -> Response:
-        serializer = SendEmailSerializer(data=req.data)
-        serializer.is_valid(raise_exception=True)
-
-        send_mail(**serializer.validated_data,
-                  from_email=settings.EMAIL_HOST_USER, fail_silently=False)
-
-        return Response({'msg': 'Successfully sent emails'})
