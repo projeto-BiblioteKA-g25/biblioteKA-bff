@@ -14,12 +14,13 @@ from drf_spectacular.utils import extend_schema
 
 class UserView(ListCreateAPIView):
     permission_classes = [IsAccountEmployeExceptPost]
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
     @extend_schema(
         operation_id="user_post",
-        description="Rota para criar um usuário sem necessidade de autenticação | token",
+        description="Rota para criar um usuário sem necessidade de autenticação | token, podendo ser um empregado ou estudante",
         summary="Criar usuário",
         tags=["users"],
     )
@@ -28,8 +29,8 @@ class UserView(ListCreateAPIView):
 
     @extend_schema(
         operation_id="users_get",
-        description="Rota para listar usuários sem necessidade de autenticação | token",
-        summary="Listar usuários",
+        description="Rota para listar usuários com necessidade de autenticação | token. Esta rota é habilitada somente para empregados",
+        summary="Listar todos os usuários",
         tags=["users"],
     )
     def get(self, request, *args, **kwargs):
@@ -43,7 +44,7 @@ class UserDetailView(generics.RetrieveDestroyAPIView):
 
     @extend_schema(
         operation_id="user_get_id",
-        description="Rota para capturar um usuário sendo necessáio que o usuário esteja autenticado | token e com permissão de acesso",
+        description="Rota para capturar um usuário sendo necessáio que o usuário esteja autenticado | token e com permissão de acesso, sendo assim, é necessário que usuário seja o dono da conta ou seja um empregado.",
         summary="Capturar usuário por ID",
         tags=["users"],
     )
@@ -52,7 +53,7 @@ class UserDetailView(generics.RetrieveDestroyAPIView):
 
     @extend_schema(
         operation_id="user_delete_id",
-        description="Rota para excluir um usuário sendo necessáio que o usuário esteja autenticado | token e com permissão de acesso. Sendo assim este usuário pode ser o dono da conta ou um empregado com autonimia para realizar a exclusão",
+        description="Rota para excluir um usuário sendo necessário que o usuário esteja autenticado | token e com permissão de acesso. Sendo assim, o usuário pode ser o dono da conta ou um empregado com autorização para realizar a exclusão",
         summary="Excluir usuário por ID",
         tags=["users"],
     )
@@ -67,7 +68,7 @@ class UserBookView(generics.RetrieveUpdateDestroyAPIView):
 
     @extend_schema(
         operation_id="user_retrive_books_by_id",
-        description="Rota capturar os dados de usuários assosciados aos livros que estão sob seus cuidados.  Para isso é necessário que o usuário esteja autenticado | token e com permissão de acesso. Sendo assim este usuário precisa ser o dono da conta",
+        description="Rota para capturar livros pelo usuários.  Para isso é necessário que o usuário esteja autenticado | token e com permissão de acesso. Sendo assim este usuário precisa ser o dono da conta",
         summary="Capturar usuário por ID associado aos livros",
         tags=["users"],
         exclude=True,
