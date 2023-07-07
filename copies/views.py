@@ -16,9 +16,12 @@ class CopyView(generics.ListCreateAPIView):
     @extend_schema(
         operation_id="copy_post",
         description="Rota para registrar a disponibilidade de um exemplar (cópia) de um livro. Para isso o usuário precisa estar autenticado como empregado",
-        summary="Registrar disponibilidade",
+        summary="Registrar disponibilidade de um exemplar (livro)",
         tags=["copies"],
     )
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
     def perform_create(self, serializer):
         pk = self.request.data.pop("book")
         book = get_object_or_404(Book, pk=pk)
