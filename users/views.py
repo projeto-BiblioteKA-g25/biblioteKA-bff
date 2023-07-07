@@ -127,7 +127,7 @@ class UserBookView(generics.RetrieveUpdateDestroyAPIView):
         for id in following:
             book = get_object_or_404(Book, id=id)
 
-            if not book in following:
+            if not book in user.following.all():
                 raise NotFollowBookError("You don't follow this book")
 
             user.following.remove(book)
