@@ -1,7 +1,7 @@
 from rest_framework.generics import ListCreateAPIView
 from .models import User
 from books.models import Book
-from .serializers import UserSerializer
+from .serializers import UserSerializer, SendEmailSerializer
 from django.shortcuts import get_object_or_404
 from .permissions import (
     IsAccountOwnerOrEmployee,
@@ -9,6 +9,9 @@ from .permissions import (
     IsAccountOwner,
 )
 from rest_framework import generics
+from rest_framework.views import APIView, Response, Request
+from django.core.mail import send_mail
+from django.conf import settings
 from drf_spectacular.utils import extend_schema
 
 
@@ -118,3 +121,14 @@ class UserBookView(generics.RetrieveUpdateDestroyAPIView):
     )
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
+
+
+class SendEmailView(APIView):
+    def post(self, req: Request) -> Response:
+        serializer = SendEmailSerializer(data=req.data)
+        serializer.is_valid(raise_exception=True)
+
+        send_mail(**serializer.validated_data,
+                  from_email=settings.EMAIL_HOST_USER, fail_silently=False)
+
+        return Response({'msg': 'Successfully sent emails'})
