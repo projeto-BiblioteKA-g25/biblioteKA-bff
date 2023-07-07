@@ -13,6 +13,9 @@ from rest_framework import generics
 from django.core.mail import send_mail
 from django.conf import settings
 from drf_spectacular.utils import extend_schema
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.views import Response
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 class UserView(ListCreateAPIView):
@@ -95,9 +98,9 @@ class UserBookView(generics.RetrieveUpdateDestroyAPIView):
             book = get_object_or_404(Book, id=id)
             user.following.add(book)
 
-            copy = get_object_or_404(Copy, book=book)
+            copy = Copy.objects.filter(book=book).first()
 
-            if copy.avaliable:
+            if copy and copy.avaliable:
                 subject = "O seu livro favorito está disponível para empréstimo!"
                 message = f'O livro "{book.title}" agora está disponível para empréstimo! Dirija-se à BiblioteKA para garantir a sua cópia.'
                 from_email = settings.EMAIL_HOST_USER
@@ -133,3 +136,16 @@ class UserBookView(generics.RetrieveUpdateDestroyAPIView):
     )
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
+
+
+class UserLoginView(TokenObtainPairView):
+    @extend_schema(
+        operation_id="user_login_post",
+        description="Rota para logar usuários sem necessidade de autenticação | token",
+        summary="Logar usuários",
+        tags=["login"],
+    )
+    def post(self, request, *args, **kwargs):
+        serializer = TokenObtainPairSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.validated_data)
