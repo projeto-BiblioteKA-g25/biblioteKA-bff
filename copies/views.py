@@ -26,7 +26,7 @@ class CopyView(generics.ListCreateAPIView):
 
     @extend_schema(
         operation_id="copy_get",
-        description="Rota para obter todos os exemplares (cópias) dos livros contendo o status atual de sua disponibilidade",
+        description="Rota para obter todos os exemplares (cópias) dos livros contendo o status atual de sua disponibilidade. Para isso o usuário não precisa de autenticação nem de permissão, sendo assim, qualquer pessoa pode acessar essa rota",
         summary="Verificar disponibilidade de todos os livros",
         tags=["copies"],
     )
@@ -38,3 +38,22 @@ class CopyDetailView(generics.UpdateAPIView):
     permission_classes = [IsAccountEmployee]
     queryset = Copy.objects.all()
     serializer_class = CopySerializer
+
+    @extend_schema(
+        operation_id="copy_put_id",
+        description="Rota para atualizar todos os campo de um exemplar (cópia) de um livro específico por ID, contendo o status atual de sua disponibilidade. Para isso o usuário  precisa de autenticação e ter permissão de empregado para realizar as alterações",
+        summary="Atualizar todos os campos de copies",
+        tags=["copies"],
+        exclude=True,
+    )
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    @extend_schema(
+        operation_id="copy_update_id",
+        description="Rota para atualizar qualquer campo de um exemplar (cópia) de um livro específico por ID, contendo o status atual de sua disponibilidade. Para isso o usuário  precisa de autenticação e ter permissão de empregado para realizar as alterações",
+        summary="Atualizar dados de copies",
+        tags=["copies"],
+    )
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
