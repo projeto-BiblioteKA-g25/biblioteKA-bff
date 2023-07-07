@@ -153,9 +153,6 @@ class LoanUserView(generics.ListAPIView):
         tags=["loans"],
     )
     def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
         user = get_object_or_404(User, pk=self.kwargs["pk"])
         self.check_object_permissions(request, user)
         return self.list(request, *args, **kwargs)
