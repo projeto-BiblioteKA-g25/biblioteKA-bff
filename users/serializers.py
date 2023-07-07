@@ -38,3 +38,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: dict) -> User:
         return User.objects.create_user(**validated_data)
+
+
+class SendEmailSerializer(serializers.Serializer):
+    subject = serializers.CharField()
+    message = serializers.CharField()
+    recipient_list = serializers.ListField()
