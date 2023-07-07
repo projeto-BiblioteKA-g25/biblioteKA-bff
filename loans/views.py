@@ -120,8 +120,7 @@ class LoanDetailView(generics.UpdateAPIView):
                 user.block_end_date = block_end_date
                 user.save()
 
-            pending_loans = Loan.objects.filter(
-                user=user, status=False).exists()
+            pending_loans = Loan.objects.filter(user=user, status=False).exists()
 
             if not pending_loans:
                 additional_block_days_after_return = 5
@@ -144,15 +143,14 @@ class LoanDetailView(generics.UpdateAPIView):
         loan.save()
 
         if copy.avaliable:
-
             if book in user.following:
-
-                subject = 'O seu livro favorito está disponível para empréstimo!'
+                subject = "O seu livro favorito está disponível para empréstimo!"
                 message = f'O livro "{book.title}" agora está disponível para empréstimo! Dirija-se à BiblioteKA para garantir a sua cópia.'
                 from_email = settings.EMAIL_HOST_USER
                 recipient_list = [user.email]
-                send_mail(subject, message, from_email,
-                          recipient_list, fail_silently=False)
+                send_mail(
+                    subject, message, from_email, recipient_list, fail_silently=False
+                )
 
 
 class LoanUserView(generics.ListAPIView):
