@@ -1,6 +1,7 @@
 from rest_framework.generics import ListCreateAPIView
 from .models import User
 from books.models import Book
+from copies.models import Copy
 from .serializers import UserSerializer
 from django.shortcuts import get_object_or_404
 from .permissions import (
@@ -9,6 +10,8 @@ from .permissions import (
     IsAccountOwner,
 )
 from rest_framework import generics
+from django.core.mail import send_mail
+from django.conf import settings
 from drf_spectacular.utils import extend_schema
 
 
@@ -89,8 +92,20 @@ class UserBookView(generics.RetrieveUpdateDestroyAPIView):
         user = self.request.user
         following = self.request.data.pop("following")
         for id in following:
-            books = get_object_or_404(Book, id=id)
-            user.following.add(books)
+            book = get_object_or_404(Book, id=id)
+            user.following.add(book)
+
+            copy = get_object_or_404(Copy, book=book)
+
+            if copy.avaliable:
+                subject = "O seu livro favorito está disponível para empréstimo!"
+                message = f'O livro "{book.title}" agora está disponível para empréstimo! Dirija-se à BiblioteKA para garantir a sua cópia.'
+                from_email = settings.EMAIL_HOST_USER
+                recipient_list = [user.email]
+                send_mail(
+                    subject, message, from_email, recipient_list, fail_silently=False
+                )
+
         serializer.save()
 
     @extend_schema(
