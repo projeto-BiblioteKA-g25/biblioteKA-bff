@@ -39,20 +39,12 @@ class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = BookSerializer
 
     @extend_schema(
-        operation_id="book_get_id",
-        description="Rota para listar um livro específico por ID sem necessidade de autenticação | token ou permissão de usuário, nesse sentido, qualquer pessoa poderá acessar essa rota",
-        summary="Listar livro por ID",
-        tags=["books"],
         exclude=True,
     )
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
 
     @extend_schema(
-        operation_id="book_put_id",
-        description="Rota para atualizar todos os campos de um livro específico por ID. Há necessidade de autenticação | token e permissão de empregado, nesse sentido, somente o empregado poderá acessar essa rota",
-        summary="Atualizar todos os dados de um livro por ID",
-        tags=["books"],
         exclude=True,
     )
     def put(self, request, *args, **kwargs):
