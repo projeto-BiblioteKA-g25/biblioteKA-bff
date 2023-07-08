@@ -11,21 +11,23 @@ from .exceptions import (
     UserIsBlockedError,
 )
 from django.shortcuts import get_object_or_404
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from users.permissions import IsAccountOwnerOrEmployee, IsAccountEmployee
+from rest_framework.permissions import IsAuthenticated
+from users.permissions import IsAccountEmployee, IsAccountOwnerOrEmployee
 from django.core.mail import send_mail
 from django.conf import settings
 from drf_spectacular.utils import extend_schema
 
 
 class LoanView(generics.ListAPIView):
+    permission_classes = [IsAccountEmployee]
+
     queryset = Loan.objects.all()
     serializer_class = LoanSerializer
 
     @extend_schema(
         operation_id="loans_get",
-        description="Rota para listar livros emprestados empréstimos. Não é necessário ter autenticação | token e permissão",
-        summary="Listar empréstimos",
+        description="Rota para listar todos os livros emprestados. É necessário estar autenticado | token e ter permissão de empregado, sendo assim, somente um empregado poderá acessar essa rota",
+        summary="Listar todos livros emprestados",
         tags=["loans"],
     )
     def get(self, request, *args, **kwargs):
@@ -33,15 +35,14 @@ class LoanView(generics.ListAPIView):
 
 
 class LoanCreateView(generics.CreateAPIView):
-    permission_classes = [IsAccountEmployee]
-    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Loan.objects.all()
     serializer_class = LoanSerializer
 
     @extend_schema(
-        operation_id="loan__copy_post_id",
-        description="Rota para registrar um empréstimo de livro de acordo com a disponilidade (avaliable) registrada na entidade copy é preciso fornnecer o ID do livro na rota. É necessário ter autenticação | token e permissão de emppregado",
-        summary="Registrar empréstimo de livro por ID conforme disponibilidade",
+        operation_id="loan_copy_post_id",
+        description="Rota para registrar um empréstimo de um exemplar de um livro de acordo com a disponilidade (avaliable) registrada na entidade copy. É preciso fornecer o ID do exemplar, neste caso, de copy na rota. É necessário ter autenticação de empregado ou estudante para realizar este registro",
+        summary="Registrar o status de um empréstimo de um livro por ID do exemplar",
         tags=["loans"],
     )
     def post(self, request, *args, **kwargs):
@@ -81,24 +82,19 @@ class LoanCreateView(generics.CreateAPIView):
 
 class LoanDetailView(generics.UpdateAPIView):
     permission_classes = [IsAccountOwnerOrEmployee]
-    authentication_classes = [JWTAuthentication]
     queryset = Loan.objects.all()
     serializer_class = LoanSerializer
 
     @extend_schema(
         operation_id="loan_update_id",
-        description="Rota para atualizar dados de um retorno de um empréstimo de livro, além disso, é necessário passar o ID do empréstimo na rota. É necessário ter autenticação | token e permissão de dono (estudante) ou empregado",
-        summary="Atualizar empréstimo de livro por ID",
+        description="Rota para registrar a devolução de um empréstimo,além disso, é necessário passar o ID do empréstimo na rota. É necessário ter autenticação | token e permissão de dono (estudante ou empregado)",
+        summary="Registrar devolução de empréstimo por ID",
         tags=["loans"],
     )
     def patch(self, request, *args, **kwargs):
         return self.partial_update(request, *args, **kwargs)
 
     @extend_schema(
-        operation_id="loan_update_total_id",
-        description="Rota para atualizar todos os dados de um empréstimo de livro. É necessário ter autenticação | token e permissão de dono (estudante) ou empregado",
-        summary="Atualizar todos os campos de empréstimo de livro",
-        tags=["loans"],
         exclude=True,
     )
     def put(self, request, *args, **kwargs):
@@ -154,14 +150,13 @@ class LoanDetailView(generics.UpdateAPIView):
 
 
 class LoanUserView(generics.ListAPIView):
-    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAccountOwnerOrEmployee]
     serializer_class = LoanSerializer
 
     @extend_schema(
         operation_id="loans_by_user_get_id",
-        description="Rota para listar todos os empréstimos de livros realizados por um usuário específico. Para isso, é necessário passar o ID do usuário na rota. É necessário ter autenticação | token e permissão de dono (estudante) ou empregado",
-        summary="Listar empréstimo de livros por ID de usuário",
+        description="Rota para listar todos os empréstimos de livros realizados por um usuário específico podendo ser um estudante ou um empregado. Para isso, é necessário passar o ID do usuário na rota. É necessário ter autenticação | token e permissão de dono (estudante ou empregado)",
+        summary="Listar empréstimos de livros por ID de usuário",
         tags=["loans"],
     )
     def get(self, request, *args, **kwargs):

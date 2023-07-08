@@ -14,7 +14,7 @@ class CopySerializer(serializers.ModelSerializer):
             "book",
         ]
 
-    def get_book(self, obj):
+    def get_book(self, obj) -> str:
         book = obj.book
         serializer = BookSerializer(book)
         return serializer.data
