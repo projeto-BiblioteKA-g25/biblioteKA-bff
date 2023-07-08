@@ -33,10 +33,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-RAILWAY_STATIC_URL = os.getenv("RAILWAY_STATIC_URL")
+RENDER_EXTERNAL_HOSTNAME = os.getenv("RENDER_EXTERNAL_HOSTNAME")
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS += [RENDER_EXTERNAL_HOSTNAME, "0.0.0.0"]
 
-if RAILWAY_STATIC_URL:
-    ALLOWED_HOSTS += [RAILWAY_STATIC_URL, "0.0.0.0"]
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_USE_TLS = True
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 # Application definition
 DJANGO_APPS = [
@@ -53,12 +59,7 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
 ]
 
-MY_APPS = [
-    "users",
-    "books",
-    "copies",
-    "loans"
-]
+MY_APPS = ["users", "books", "copies", "loans"]
 
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + MY_APPS
@@ -86,7 +87,7 @@ TEMPLATES = [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages"
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
@@ -109,12 +110,13 @@ DATABASES = {
     }
 }
 
-DATABASE_URL = os.getenv('DATABASE_URL')
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 if DATABASE_URL:
     db_from_env = dj_database_url.config(
-        default=DATABASE_URL, conn_max_age=500, ssl_require=True)
-    DATABASES['default'].update(db_from_env)
+        default=DATABASE_URL, conn_max_age=500, ssl_require=True
+    )
+    DATABASES["default"].update(db_from_env)
     DEBUG = False
 
 if not DEBUG:
@@ -185,7 +187,7 @@ SIMPLE_JWT = {
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "BiblioteKA",
-    "DESCRIPTION": "Your project description",
+    "DESCRIPTION": "Project developed to loan books to users",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
