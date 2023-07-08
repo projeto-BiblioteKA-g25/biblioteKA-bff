@@ -43,10 +43,6 @@ class CopyDetailView(generics.UpdateAPIView):
     serializer_class = CopySerializer
 
     @extend_schema(
-        operation_id="copy_put_id",
-        description="Rota para atualizar todos os campo de um exemplar (cópia) de um livro específico por ID, contendo o status atual de sua disponibilidade. Para isso o usuário  precisa de autenticação e ter permissão de empregado para realizar as alterações",
-        summary="Atualizar todos os campos de copies",
-        tags=["copies"],
         exclude=True,
     )
     def put(self, request, *args, **kwargs):

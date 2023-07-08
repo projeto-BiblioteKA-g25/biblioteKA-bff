@@ -74,10 +74,6 @@ class UserBookView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
 
     @extend_schema(
-        operation_id="user_retrive_books_by_id",
-        description="Rota para capturar livros seguidos pelo ID do usuário.  Para isso é necessário que o usuário esteja autenticado | token e com permissão de acesso. Sendo assim este usuário precisa ser o dono da conta",
-        summary="Capturar usuário por ID associado aos livros",
-        tags=["users"],
         exclude=True,
     )
     def get(self, request, *args, **kwargs):
@@ -133,10 +129,6 @@ class UserBookView(generics.RetrieveUpdateDestroyAPIView):
             user.following.remove(book)
 
     @extend_schema(
-        operation_id="user_retrive_put",
-        description="Rota para seguir livros, sendo necessário a indicação do ID do usuário na URL e no campo 'following' os ID's do livros que serão seguidos. Apenas o usuário poderá acrescentar os livros que deseja seguir no seu campo 'following'. Para isso é necessário que o usuário esteja autenticado | token e com permissão de acesso.",
-        summary="Alterar todos os dados de um usuários específico por ID",
-        tags=["users"],
         exclude=True,
     )
     def put(self, request, *args, **kwargs):
