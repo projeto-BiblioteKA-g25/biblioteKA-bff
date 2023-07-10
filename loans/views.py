@@ -6,6 +6,7 @@ from books.models import Book
 from users.models import User
 from .serializers import LoanSerializer
 from .exceptions import (
+    LoanAlreadyReturnError,
     SuspendedUserError,
     CopyUnavailableError,
     UserIsBlockedError,
@@ -68,14 +69,12 @@ class LoanCreateView(generics.CreateAPIView):
 
         book = Book.objects.get(pk=copy.book.id)
 
-        if book.quantity == 0:
-            copy.avaliable = False
-            book.save()
+        if not copy.avaliable:
             raise CopyUnavailableError("This book copy is unavailable")
 
         else:
-            book.quantity -= 1
-            book.save()
+            copy.avaliable = False
+            copy.save()
 
             serializer.save(return_date=date_return, user=user, copy=copy)
 
@@ -106,6 +105,12 @@ class LoanDetailView(generics.UpdateAPIView):
         copy = Copy.objects.get(pk=loan.copy.id)
         user = User.objects.get(pk=loan.user.id)
 
+        if loan.status:
+            raise LoanAlreadyReturnError("This book already returned")
+
+        loan.status = True
+        loan.save()
+
         date_now = datetime.now().date()
         date_return = loan.return_date
         block_end_date = date_now + timedelta(days=3)
@@ -129,17 +134,11 @@ class LoanDetailView(generics.UpdateAPIView):
                 "This user can not borrow any books for at least 5 more days"
             )
 
-        book.quantity += 1
-        book.save()
-
         copy.avaliable = True
         copy.save()
 
-        loan.status = True
-        loan.save()
-
         if copy.avaliable:
-            if book in user.following:
+            if book in user.following.all():
                 subject = "O seu livro favorito está disponível para empréstimo!"
                 message = f'O livro "{book.title}" agora está disponível para empréstimo! Dirija-se à BiblioteKA para garantir a sua cópia.'
                 from_email = settings.EMAIL_HOST_USER
