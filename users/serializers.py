@@ -21,6 +21,8 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "following": {"read_only": True},
             "password": {"write_only": True},
+            "is_blocked": {"read_only": True},
+            "block_end_date": {"read_only": True},
             "username": {
                 "validators": [
                     UniqueValidator(
