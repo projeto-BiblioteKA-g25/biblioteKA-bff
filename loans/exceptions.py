@@ -11,3 +11,7 @@ class CopyUnavailableError(APIException):
 
 class UserIsBlockedError(APIException):
     status_code = 403
+
+
+class LoanAlreadyReturnError(APIException):
+    status_code = 403
